@@ -1,0 +1,19 @@
+{% extends "emails/base.html" %}
+
+{% block preheader %}A new video has been picked for you.{% endblock %}
+
+{% block content %}
+  {% include "emails/_heading.html" with heading="A new video for you" %}
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">Hi {{ first_name|default:"there" }},</p>
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">Your dietician has picked a video for your plan.</p>
+
+  {% include "emails/_details.html" %}
+
+  {% if notes %}
+    {% include "emails/_note.html" with note_title="Your dietician's note" note_body=notes %}
+  {% endif %}
+
+  {% include "emails/_button.html" with button_url=frontend_url|add:"/dashboard/videos" button_label="Watch the video" %}
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "emails/base.html" %}
+
+{% block preheader %}Your diet plan has been updated.{% endblock %}
+
+{% block content %}
+  {% include "emails/_heading.html" with heading="Your diet plan has been updated" %}
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">Hi {{ first_name|default:"there" }},</p>
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">Your dietician has made changes to your plan. Have a look so you are following the latest version.</p>
+
+  {% include "emails/_details.html" %}
+
+  {% if description %}
+    {% include "emails/_note.html" with note_title="What changed" note_body=description %}
+  {% endif %}
+
+  {% include "emails/_button.html" with button_url=frontend_url|add:"/dashboard" button_label="See the changes" %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "emails/base.html" %}
+
+{% block preheader %}Your consultation is confirmed.{% endblock %}
+
+{% block content %}
+  {% include "emails/_heading.html" with heading="Your appointment is confirmed" %}
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">Hi {{ first_name|default:"there" }},</p>
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">Your consultation is booked. Here are the details.</p>
+
+  {% include "emails/_details.html" %}
+
+  {% if meeting_url %}
+    {% include "emails/_button.html" with button_url=meeting_url button_label="Join the meeting" %}
+  {% else %}
+    {% include "emails/_button.html" with button_url=frontend_url|add:"/dashboard/appointments" button_label="View my appointments" %}
+  {% endif %}
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">If you need to change the time, open your appointments page before the session.</p>
+{% endblock %}

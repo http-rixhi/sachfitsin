@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sachfitsin — Nutrition &amp; Wellness</title>
+    <meta name="description" content="Articles, videos, personalised diet plans, exercises and daily trackers from your dietician." />
+    <meta name="theme-color" content="#f7faf8" />
+
+    <!--
+      Razorpay Checkout, loaded from Razorpay's own servers.
+      This gives the page window.Razorpay.
+
+      Only the public key id (rzp_test_... / rzp_live_...) is ever sent to
+      the browser, and it comes from the create-order API response. The
+      secret key stays in Django and must never appear here or in any
+      VITE_ variable, because those are compiled into the public bundle.
+    -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

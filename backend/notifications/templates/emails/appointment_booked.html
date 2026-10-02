@@ -1,0 +1,15 @@
+{% extends "emails/base.html" %}
+
+{% block preheader %}We have your booking request. Next step: pick your time slot.{% endblock %}
+
+{% block content %}
+  {% include "emails/_heading.html" with heading="Your appointment request is in" %}
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">Hi {{ first_name|default:"there" }},</p>
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">We have received your consultation request. Please pick a time slot so your dietician can confirm it.</p>
+
+  {% include "emails/_details.html" %}
+
+  {% include "emails/_button.html" with button_url=frontend_url|add:"/dashboard/appointments" button_label="View my appointments" %}
+{% endblock %}

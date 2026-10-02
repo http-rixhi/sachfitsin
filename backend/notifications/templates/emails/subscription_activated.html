@@ -1,0 +1,15 @@
+{% extends "emails/base.html" %}
+
+{% block preheader %}Your {{ product_name }} access is now active.{% endblock %}
+
+{% block content %}
+  {% include "emails/_heading.html" with heading="Your access is active" %}
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">Hi {{ first_name|default:"there" }},</p>
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">{{ product_name }} is now unlocked on your account. You can start using it straight away.</p>
+
+  {% include "emails/_details.html" %}
+
+  {% include "emails/_button.html" with button_url=frontend_url|add:"/dashboard" button_label="Open my dashboard" %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "emails/base.html" %}
+
+{% block preheader %}A new exercise has been added to your plan.{% endblock %}
+
+{% block content %}
+  {% include "emails/_heading.html" with heading="A new exercise for you" %}
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">Hi {{ first_name|default:"there" }},</p>
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">Your dietician has added an exercise to your plan. Start slowly and stop if anything hurts.</p>
+
+  {% include "emails/_details.html" %}
+
+  {% if notes %}
+    {% include "emails/_note.html" with note_title="Your dietician's note" note_body=notes %}
+  {% endif %}
+
+  {% if precautions %}
+    {% include "emails/_note.html" with note_title="Be careful" note_body=precautions %}
+  {% endif %}
+
+  {% include "emails/_button.html" with button_url=frontend_url|add:"/dashboard/exercises" button_label="See my exercises" %}
+{% endblock %}

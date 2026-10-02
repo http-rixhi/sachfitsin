@@ -1,0 +1,80 @@
+from django.urls import path
+
+from .views import (
+    MyCalorieProfileView,
+    MyCalorieEntryListCreateView,
+    MyCalorieEntryDetailView,
+    MyDailyCalorieSummaryView,
+    DieticianCalorieProfileDetailView,
+    DieticianCalorieEntryListView,
+    MyWaterProfileView,
+    MyWaterEntryListCreateView,
+    MyWaterEntryDetailView,
+    MyDailyWaterSummaryView,
+    DieticianWaterProfileDetailView,
+    DieticianWaterEntryListView,
+)
+
+
+urlpatterns = [
+    path(
+        "calories/profile/",
+        MyCalorieProfileView.as_view(),
+        name="my-calorie-profile",
+    ),
+    path(
+        "calories/entries/",
+        MyCalorieEntryListCreateView.as_view(),
+        name="my-calorie-entries",
+    ),
+    path(
+        "calories/entries/<int:pk>/",
+        MyCalorieEntryDetailView.as_view(),
+        name="my-calorie-entry-detail",
+    ),
+    path(
+        "calories/summary/",
+        MyDailyCalorieSummaryView.as_view(),
+        name="my-calorie-summary",
+    ),
+    path(
+        "manage/calories/profile/<int:customer_id>/",
+        DieticianCalorieProfileDetailView.as_view(),
+        name="dietician-calorie-profile",
+    ),
+    path(
+        "manage/calories/entries/",
+        DieticianCalorieEntryListView.as_view(),
+        name="dietician-calorie-entries",
+    ),
+    path(
+        "water/profile/",
+        MyWaterProfileView.as_view(),
+        name="my-water-profile",
+    ),
+    path(
+        "water/entries/",
+        MyWaterEntryListCreateView.as_view(),
+        name="my-water-entries",
+    ),
+    path(
+        "water/entries/<int:pk>/",
+        MyWaterEntryDetailView.as_view(),
+        name="my-water-entry-detail",
+    ),
+    path(
+        "water/summary/",
+        MyDailyWaterSummaryView.as_view(),
+        name="my-water-summary",
+    ),
+    path(
+        "manage/water/profile/<int:customer_id>/",
+        DieticianWaterProfileDetailView.as_view(),
+        name="dietician-water-profile",
+    ),
+    path(
+        "manage/water/entries/",
+        DieticianWaterEntryListView.as_view(),
+        name="dietician-water-entries",
+    ),
+]
