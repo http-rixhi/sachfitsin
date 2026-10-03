@@ -109,8 +109,20 @@ Neon gives you two. They are not interchangeable.
 
 Use the **direct** one. Render runs a long-lived gunicorn process with 2
 workers, so it holds about 2 connections — nowhere near needing a pooler.
-The pooled endpoint runs PgBouncer in transaction mode, which quietly
-breaks session-level Postgres features Django uses.
+
+To be precise about why, since an earlier version of this file overstated
+it: the pooled endpoint runs PgBouncer in transaction mode, and this
+codebase would in fact work on it today. It uses no `QuerySet.iterator()`,
+no advisory locks and no `LISTEN`/`NOTIFY`, and every `select_for_update`
+sits inside a transaction, which transaction pooling handles correctly.
+
+The direct endpoint is still the right default for two reasons:
+
+- Holding a connection for 600 seconds through a pooler defeats most of
+  what the pooler is for.
+- The day someone adds `.iterator()` over a large queryset, the pooled
+  endpoint breaks it, and the failure will not look like a pooling
+  problem.
 
 Keep `?sslmode=require` on the end. Neon includes it already.
 
