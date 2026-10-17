@@ -10,7 +10,8 @@ from rest_framework.test import APITestCase
 
 from products.models import Product
 from subscriptions.models import Entitlement, Subscription
-from subscriptions.services import has_entitlement
+from subscriptions.features import Feature, PlanCode
+from subscriptions.services import has_entitlement, has_feature
 
 User = get_user_model()
 
@@ -167,17 +168,20 @@ class FreePlanAccessTests(TestCase):
             role=User.Role.CUSTOMER,
         )
 
+        # Codes of their own. The real catalogue is seeded by a data
+        # migration, so reusing a live code would collide on the unique
+        # constraint and would also tie this test to today's pricing.
         self.free = Product.objects.create(
-            code="EXERCISE_RECOMMENDATIONS",
-            name="Exercise Recommendations",
+            code="TEST_FREE_PLAN",
+            name="A free plan",
             price="0.00",
             billing_type=Product.BillingType.FREE,
             status=Product.Status.ACTIVE,
         )
 
         self.paid = Product.objects.create(
-            code="PERSONALIZED_NUTRITION_COACHING",
-            name="Coaching",
+            code="TEST_PAID_PLAN",
+            name="A paid plan",
             price="2499.00",
             billing_type=Product.BillingType.MONTHLY,
             duration_days=30,
@@ -190,14 +194,12 @@ class FreePlanAccessTests(TestCase):
         )
 
         self.assertTrue(
-            has_entitlement(self.customer, "EXERCISE_RECOMMENDATIONS")
+            has_entitlement(self.customer, "TEST_FREE_PLAN")
         )
 
     def test_a_paid_plan_still_needs_an_entitlement(self):
         self.assertFalse(
-            has_entitlement(
-                self.customer, "PERSONALIZED_NUTRITION_COACHING"
-            )
+            has_entitlement(self.customer, "TEST_PAID_PLAN")
         )
 
     def test_taking_a_free_plan_off_sale_removes_access(self):
@@ -205,7 +207,7 @@ class FreePlanAccessTests(TestCase):
         self.free.save()
 
         self.assertFalse(
-            has_entitlement(self.customer, "EXERCISE_RECOMMENDATIONS")
+            has_entitlement(self.customer, "TEST_FREE_PLAN")
         )
 
     def test_making_a_free_plan_paid_removes_access(self):
@@ -216,7 +218,7 @@ class FreePlanAccessTests(TestCase):
         self.free.save()
 
         self.assertFalse(
-            has_entitlement(self.customer, "EXERCISE_RECOMMENDATIONS")
+            has_entitlement(self.customer, "TEST_FREE_PLAN")
         )
 
     def test_a_logged_out_visitor_gets_nothing(self):
@@ -276,3 +278,184 @@ class FreePlanEndToEndTests(APITestCase):
             200,
             "setting a plan to Free must unlock it for customers",
         )
+
+
+class FeatureAccessTests(TestCase):
+    """
+    One purchase can unlock several features, and several plans can unlock
+    the same one. These check the ladder the packages are priced around:
+    diet plan, then coaching adds videos, then training adds exercises.
+    """
+
+    def setUp(self):
+        self.customer = User.objects.create_user(
+            username="customer",
+            email="customer@example.com",
+            password="password123",
+            role=User.Role.CUSTOMER,
+        )
+
+    def grant(self, code, expires_at=None):
+        """Give the customer a live entitlement for one catalogue plan."""
+
+        product = Product.objects.get(code=code)
+
+        return Entitlement.objects.create(
+            customer=self.customer,
+            product=product,
+            status=Entitlement.Status.ACTIVE,
+            starts_at=timezone.now() - timedelta(minutes=1),
+            expires_at=expires_at,
+        )
+
+    def test_a_new_customer_has_nothing(self):
+        self.assertFalse(
+            has_feature(self.customer, Feature.PERSONALIZED_VIDEOS)
+        )
+        self.assertFalse(
+            has_feature(self.customer, Feature.EXERCISE_ROUTINES)
+        )
+
+    def test_the_diet_plan_unlocks_no_app_features(self):
+        self.grant(PlanCode.LIFESTYLE_DIET_PLAN)
+
+        self.assertFalse(
+            has_feature(self.customer, Feature.PERSONALIZED_VIDEOS)
+        )
+        self.assertFalse(
+            has_feature(self.customer, Feature.EXERCISE_ROUTINES)
+        )
+
+    def test_coaching_unlocks_videos_but_not_exercises(self):
+        self.grant(PlanCode.NUTRITION_COACHING_1M)
+
+        self.assertTrue(
+            has_feature(self.customer, Feature.PERSONALIZED_VIDEOS)
+        )
+        self.assertFalse(
+            has_feature(self.customer, Feature.EXERCISE_ROUTINES)
+        )
+
+    def test_three_month_coaching_unlocks_the_same_as_one_month(self):
+        self.grant(PlanCode.NUTRITION_COACHING_3M)
+
+        self.assertTrue(
+            has_feature(self.customer, Feature.PERSONALIZED_VIDEOS)
+        )
+        self.assertFalse(
+            has_feature(self.customer, Feature.EXERCISE_ROUTINES)
+        )
+
+    def test_training_unlocks_both(self):
+        self.grant(PlanCode.NUTRITION_TRAINING_1M)
+
+        self.assertTrue(
+            has_feature(self.customer, Feature.PERSONALIZED_VIDEOS)
+        )
+        self.assertTrue(
+            has_feature(self.customer, Feature.EXERCISE_ROUTINES)
+        )
+
+    def test_three_month_training_unlocks_both(self):
+        self.grant(PlanCode.NUTRITION_TRAINING_3M)
+
+        self.assertTrue(
+            has_feature(self.customer, Feature.PERSONALIZED_VIDEOS)
+        )
+        self.assertTrue(
+            has_feature(self.customer, Feature.EXERCISE_ROUTINES)
+        )
+
+    def test_the_retired_plan_still_works_for_whoever_bought_it(self):
+        # The old plan only exists on databases that sold it, so this
+        # test recreates that situation rather than assuming it.
+        legacy, _ = Product.objects.get_or_create(
+            code=PlanCode.LEGACY_EXERCISE_RECOMMENDATIONS,
+            defaults={
+                "name": "Exercise Recommendations",
+                "price": "299.00",
+                "billing_type": Product.BillingType.ONE_TIME,
+                "status": Product.Status.INACTIVE,
+            },
+        )
+
+        Entitlement.objects.create(
+            customer=self.customer,
+            product=legacy,
+            status=Entitlement.Status.ACTIVE,
+            starts_at=timezone.now() - timedelta(minutes=1),
+        )
+
+        # Off sale, but access that was paid for must not vanish.
+        self.assertTrue(
+            has_feature(self.customer, Feature.EXERCISE_ROUTINES)
+        )
+
+    def test_an_expired_plan_unlocks_nothing(self):
+        self.grant(
+            PlanCode.NUTRITION_TRAINING_1M,
+            expires_at=timezone.now() - timedelta(seconds=1),
+        )
+
+        self.assertFalse(
+            has_feature(self.customer, Feature.PERSONALIZED_VIDEOS)
+        )
+        self.assertFalse(
+            has_feature(self.customer, Feature.EXERCISE_ROUTINES)
+        )
+
+    def test_one_customer_does_not_unlock_another(self):
+        self.grant(PlanCode.NUTRITION_TRAINING_3M)
+
+        other = User.objects.create_user(
+            username="other",
+            email="other@example.com",
+            password="password123",
+            role=User.Role.CUSTOMER,
+        )
+
+        self.assertFalse(
+            has_feature(other, Feature.EXERCISE_ROUTINES)
+        )
+
+
+class CataloguePricingTests(TestCase):
+    """The packages on sale, exactly as the owner priced them."""
+
+    EXPECTED = {
+        PlanCode.LIFESTYLE_DIET_PLAN: ("499.00", "ONE_TIME", None),
+        PlanCode.NUTRITION_COACHING_1M: ("2499.00", "MONTHLY", 30),
+        PlanCode.NUTRITION_COACHING_3M: ("3999.00", "MONTHLY", 90),
+        PlanCode.NUTRITION_TRAINING_1M: ("3999.00", "MONTHLY", 30),
+        PlanCode.NUTRITION_TRAINING_3M: ("6999.00", "MONTHLY", 90),
+    }
+
+    def test_every_package_is_on_sale_at_the_right_price(self):
+        for code, (price, billing, days) in self.EXPECTED.items():
+            with self.subTest(code=code):
+                product = Product.objects.get(code=code)
+
+                self.assertEqual(str(product.price), price)
+                self.assertEqual(product.billing_type, billing)
+                self.assertEqual(product.duration_days, days)
+                self.assertEqual(product.status, Product.Status.ACTIVE)
+
+    def test_the_retired_plan_is_not_on_sale(self):
+        # True whether the row was never created or was switched off: the
+        # property that matters is that nobody can buy it.
+        self.assertFalse(
+            Product.objects.filter(
+                code=PlanCode.LEGACY_EXERCISE_RECOMMENDATIONS,
+                status=Product.Status.ACTIVE,
+            ).exists()
+        )
+
+    def test_no_paid_package_is_free_by_accident(self):
+        for product in Product.objects.filter(status=Product.Status.ACTIVE):
+            with self.subTest(code=product.code):
+                if product.billing_type != Product.BillingType.FREE:
+                    self.assertGreater(
+                        product.price,
+                        0,
+                        "a paid plan priced at zero cannot be bought",
+                    )

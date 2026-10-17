@@ -245,7 +245,7 @@ export default function Dashboard() {
                     icon={<Dumbbell />}
                     tone="neutral"
                     label="Exercises in library"
-                    value={exercisesQuery.isLoading ? "—" : exercises.length}
+                    value={exercisesQuery.isLoading ? "-" : exercises.length}
                     sub={`${
                         exercises.filter((item) => item.is_active).length
                     } active`}
@@ -255,7 +255,7 @@ export default function Dashboard() {
                     icon={<BookOpen />}
                     tone="neutral"
                     label="Articles"
-                    value={contentQuery.isLoading ? "—" : content.length}
+                    value={contentQuery.isLoading ? "-" : content.length}
                     sub={`${publishedContent.length} live on the public site`}
                 />
 
@@ -264,7 +264,7 @@ export default function Dashboard() {
                     tone="neutral"
                     label="Personalised videos"
                     value={
-                        personalizedQuery.isLoading ? "—" : personalized.length
+                        personalizedQuery.isLoading ? "-" : personalized.length
                     }
                     sub={`${
                         personalized.filter((item) => item.status === "ACTIVE")
@@ -430,7 +430,7 @@ export default function Dashboard() {
 
             {appointmentsQuery.isError && (
                 <Badge tone="warning">
-                    Appointment count could not be loaded — check the
+                    Appointment count could not be loaded. Check the
                     appointments API.
                 </Badge>
             )}

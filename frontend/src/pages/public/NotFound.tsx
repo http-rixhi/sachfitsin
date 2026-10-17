@@ -1,8 +1,14 @@
 import { Compass } from "lucide-react";
 
 import { ButtonLink } from "@/components/ui/button";
+import { useSeo } from "@/lib/seo";
 
 export default function NotFound() {
+    useSeo({
+        title: "Page Not Found",
+        noIndex: true,
+    });
+
     return (
         <div className="app-container flex min-h-[70dvh] flex-col items-center justify-center py-16 text-center">
             <span className="flex size-16 items-center justify-center rounded-2xl bg-accent text-accent-foreground">

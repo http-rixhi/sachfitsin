@@ -76,7 +76,13 @@ class ProductListTests(APITestCase):
         )
 
         self.assertEqual(response.status_code, 405)
-        self.assertEqual(Product.objects.count(), 2)
+
+        # Nothing was created. An absolute count would be wrong here:
+        # the catalogue migration seeds the real packages into every
+        # database, including this one.
+        self.assertFalse(
+            Product.objects.filter(code="FREE_STUFF").exists()
+        )
 
 
 class AdminProductTests(APITestCase):

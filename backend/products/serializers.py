@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from subscriptions.features import features_for_plan
+
 from .models import Product
 
 
@@ -11,6 +13,8 @@ class ProductSerializer(serializers.ModelSerializer):
     through the API, so there is no write path to get wrong.
     """
 
+    features = serializers.SerializerMethodField()
+
     class Meta:
         model = Product
         fields = [
@@ -21,8 +25,19 @@ class ProductSerializer(serializers.ModelSerializer):
             "billing_type",
             "price",
             "duration_days",
+            "features",
         ]
         read_only_fields = fields
+
+    def get_features(self, product):
+        """
+        What this plan unlocks in the app.
+
+        Sent so the front end never needs its own copy of the plan to
+        feature mapping, which would drift the moment pricing changed.
+        """
+
+        return features_for_plan(product.code)
 
 
 class AdminProductSerializer(serializers.ModelSerializer):

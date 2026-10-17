@@ -25,6 +25,7 @@ class ErrorCode:
     INVALID_TOKEN = "invalid_token"
     TOKEN_EXPIRED = "token_expired"
     INVALID_CREDENTIALS = "invalid_credentials"
+    INVALID_CODE = "invalid_code"
     PERMISSION_DENIED = "permission_denied"
     ENTITLEMENT_REQUIRED = "entitlement_required"
     NOT_FOUND = "not_found"
@@ -53,6 +54,9 @@ DEFAULT_MESSAGES = {
     ),
     ErrorCode.INVALID_CREDENTIALS: (
         "Invalid username or password."
+    ),
+    ErrorCode.INVALID_CODE: (
+        "That code is not valid. It may have expired."
     ),
     ErrorCode.PERMISSION_DENIED: (
         "You do not have permission to do this."

@@ -52,6 +52,60 @@ class CalendlyUnavailable(SafeMessageAPIException):
     default_code = ErrorCode.UPSTREAM_ERROR
 
 
+class VerificationEmailFailed(SafeMessageAPIException):
+    """
+    The sign-up code could not be emailed, so there is nothing for the
+    caller to type in.
+
+    Every other email in this project is a side effect: if it fails the
+    business operation still stands. This one IS the operation, so it has
+    to be reported rather than swallowed, or the person waits forever for
+    a code that was never sent.
+    """
+
+    status_code = http_status.HTTP_503_SERVICE_UNAVAILABLE
+    default_detail = (
+        "We could not send the verification code right now. "
+        "Please try again in a moment."
+    )
+    default_code = ErrorCode.SERVICE_UNAVAILABLE
+
+
+class InvalidSignupCode(SafeMessageAPIException):
+    """
+    The code was wrong, expired, or the attempt had already been burned.
+
+    One shared message for all three. Telling a guesser which it was is
+    free information about how close they are.
+    """
+
+    status_code = http_status.HTTP_400_BAD_REQUEST
+    default_detail = (
+        "That code is not valid. It may have expired - "
+        "ask for a new one."
+    )
+    default_code = ErrorCode.INVALID_CODE
+
+
+class SignupNotStarted(SafeMessageAPIException):
+    """Asked to resend a code for an address with nothing in progress."""
+
+    status_code = http_status.HTTP_404_NOT_FOUND
+    default_detail = (
+        "We have no sign-up waiting for that address. "
+        "Please start again."
+    )
+    default_code = ErrorCode.NOT_FOUND
+
+
+class ResendTooSoon(SafeMessageAPIException):
+    """A new code was asked for before the cooldown had passed."""
+
+    status_code = http_status.HTTP_429_TOO_MANY_REQUESTS
+    default_detail = "Please wait before asking for another code."
+    default_code = ErrorCode.THROTTLED
+
+
 class EntitlementRequired(drf_exceptions.APIException):
     """
     The customer is logged in and is a customer, but their plan does not
@@ -70,6 +124,10 @@ class EntitlementRequired(drf_exceptions.APIException):
 # subclasses must be listed before their parents.
 EXCEPTION_CODES = [
     (EntitlementRequired, ErrorCode.ENTITLEMENT_REQUIRED),
+    (InvalidSignupCode, ErrorCode.INVALID_CODE),
+    (SignupNotStarted, ErrorCode.NOT_FOUND),
+    (ResendTooSoon, ErrorCode.THROTTLED),
+    (VerificationEmailFailed, ErrorCode.SERVICE_UNAVAILABLE),
     (CalendlyUnavailable, ErrorCode.UPSTREAM_ERROR),
     (drf_exceptions.NotAuthenticated, ErrorCode.AUTHENTICATION_REQUIRED),
     ((InvalidToken, TokenError), ErrorCode.INVALID_TOKEN),
@@ -199,6 +257,12 @@ def _safe_detail(exc) -> str:
         return ""
 
     text = str(detail)
+
+    # Our own exceptions carry a message written for the customer, so the
+    # class default IS the thing worth showing. Only DRF's placeholders
+    # ("Not found.", "A server error occurred.") are dropped.
+    if isinstance(exc, SafeMessageAPIException):
+        return text
 
     class_default = str(getattr(exc, "default_detail", "") or "")
 

@@ -1,5 +1,5 @@
 /**
- * Fired by the Axios layer when a session can no longer be recovered —
+ * Fired by the Axios layer when a session can no longer be recovered,
  * the refresh token is missing, expired, or was rejected.
  *
  * It lives in its own module so `services/api.ts` and `contexts/

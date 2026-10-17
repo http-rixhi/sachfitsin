@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { BuyProductButton } from "@/components/BuyProductButton";
+import type { Feature } from "@/services/products";
 import { Button, ButtonLink } from "@/components/ui/button";
 import {
     errorMessage,
@@ -25,10 +26,11 @@ interface ApiErrorStateProps {
     /** Shown instead of the backend message, when a page has better words. */
     title?: string;
     /**
-     * Product code to offer when the error turns out to be
-     * "not in your plan". Ignored for every other kind of error.
+     * The feature the customer was trying to reach. When the error turns
+     * out to be "not in your plan", the cheapest plan that unlocks it is
+     * offered. Ignored for every other kind of error.
      */
-    upgradeProductCode?: string;
+    upgradeFeature?: Feature;
     className?: string;
 }
 
@@ -44,7 +46,7 @@ export function ApiErrorState({
     onRetry,
     isRetrying = false,
     title,
-    upgradeProductCode,
+    upgradeFeature,
     className,
 }: ApiErrorStateProps) {
     const { isNetwork } = toApiError(error);
@@ -53,7 +55,7 @@ export function ApiErrorState({
         return (
             <UpgradeRequired
                 message={errorMessage(error)}
-                productCode={upgradeProductCode}
+                feature={upgradeFeature}
                 className={className}
             />
         );
@@ -145,12 +147,15 @@ export function AccessDenied({
 
 export function UpgradeRequired({
     message = "This feature is not included in your plan.",
-    productCode,
+    feature,
     className,
 }: {
     message?: string;
-    /** When given, shows the price and a Buy button for that product. */
-    productCode?: string;
+    /**
+     * When given, shows the price and a Buy button for the cheapest plan
+     * that unlocks this feature.
+     */
+    feature?: Feature;
     className?: string;
 }) {
     return (
@@ -172,8 +177,8 @@ export function UpgradeRequired({
                 {message}
             </p>
 
-            {productCode ? (
-                <BuyProductButton code={productCode} />
+            {feature ? (
+                <BuyProductButton feature={feature} />
             ) : (
                 <p className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary">
                     <Sparkles className="size-4" />

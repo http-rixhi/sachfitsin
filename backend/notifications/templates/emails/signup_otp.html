@@ -1,0 +1,23 @@
+{% extends "emails/base.html" %}
+
+{% block preheader %}Your {{ site_name }} verification code is {{ code }}. It expires in {{ minutes }} minutes.{% endblock %}
+
+{% block content %}
+  {% include "emails/_heading.html" with heading="Confirm your email" %}
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">Hi {{ first_name|default:"there" }},</p>
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">Enter this code to finish creating your {{ site_name }} account.</p>
+
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 24px;">
+    <tr>
+      <td align="center" style="padding:20px 16px; background-color:#f1f7f4; border:1px solid #d7e6de; border-radius:12px;">
+        <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:32px; font-weight:700; letter-spacing:8px; color:#1f3d31;">{{ code }}</div>
+      </td>
+    </tr>
+  </table>
+
+  <p style="margin:0 0 16px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; font-size:15px; line-height:24px; color:#3c4a43;">The code expires in {{ minutes }} minutes. Until you enter it, no account has been created.</p>
+
+  {% include "emails/_note.html" with note_title="Didn't sign up?" note_body="You can ignore this email. No account has been created, and the code is useless to anyone without access to your inbox." %}
+{% endblock %}

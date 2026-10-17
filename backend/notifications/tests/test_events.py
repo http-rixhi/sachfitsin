@@ -174,9 +174,21 @@ class RegistrationFlowTests(APITestCase):
         cache.clear()
         self.addCleanup(cache.clear)
 
+    @staticmethod
+    def _code_from(mocked_send):
+        text = mocked_send.call_args.kwargs["text"]
+
+        return next(
+            token
+            for token in text.replace("\n", " ").split()
+            if token.isdigit() and len(token) == 6
+        )
+
     @patch("notifications.email.service.client.send", return_value="msg_1")
     def test_register_creates_user_notification_and_email(self, mocked_send):
-        response = self.client.post(
+        # Sign-up is two steps now. Step one creates nothing and only
+        # emails a code; the account appears at step two.
+        start = self.client.post(
             reverse("register"),
             {
                 "username": "newbie",
@@ -185,6 +197,17 @@ class RegistrationFlowTests(APITestCase):
                 "first_name": "New",
                 "last_name": "Person",
             },
+            format="json",
+        )
+
+        self.assertEqual(start.status_code, 202)
+        self.assertFalse(User.objects.filter(username="newbie").exists())
+
+        code = self._code_from(mocked_send)
+
+        response = self.client.post(
+            reverse("verify-email"),
+            {"email": "newbie@example.com", "code": code},
             format="json",
         )
 
@@ -198,20 +221,38 @@ class RegistrationFlowTests(APITestCase):
         self.assertEqual(
             EmailLog.objects.get(user=user).status, EmailStatus.SENT
         )
-        self.assertEqual(mocked_send.call_count, 1)
 
-    @patch(
-        "notifications.email.service.client.send",
-        side_effect=RuntimeError("Resend is down"),
-    )
-    def test_registration_still_succeeds_when_email_fails(self, _mock):
-        response = self.client.post(
+        # Two emails now: the code, then the welcome.
+        self.assertEqual(mocked_send.call_count, 2)
+
+    @patch("notifications.email.service.client.send", return_value="msg_1")
+    def test_account_survives_a_failing_welcome_email(self, mocked_send):
+        """
+        The welcome email is a side effect and must never undo a sign-up.
+
+        The verification code is the opposite case and is covered in
+        accounts.tests: if THAT email fails the sign-up is refused,
+        because there would be nothing for the person to type in.
+        """
+
+        self.client.post(
             reverse("register"),
             {
                 "username": "newbie",
                 "email": "newbie@example.com",
                 "password": "password123",
             },
+            format="json",
+        )
+
+        code = self._code_from(mocked_send)
+
+        # The code went out fine; only the welcome email breaks.
+        mocked_send.side_effect = RuntimeError("Resend is down")
+
+        response = self.client.post(
+            reverse("verify-email"),
+            {"email": "newbie@example.com", "code": code},
             format="json",
         )
 

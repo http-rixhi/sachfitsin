@@ -6,6 +6,7 @@ import {
     CheckCircle2,
     Infinity as InfinityIcon,
     PackageOpen,
+    Sparkles,
 } from "lucide-react";
 
 import { BuyProductButton } from "@/components/BuyProductButton";
@@ -14,7 +15,11 @@ import { Card, CardBody } from "@/components/ui/card";
 import { ApiErrorState } from "@/components/ui/error-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { CardSkeleton, EmptyState } from "@/components/ui/states";
-import { getProducts, type Product } from "@/services/products";
+import {
+    formatPrice,
+    getProducts,
+    type Product,
+} from "@/services/products";
 import {
     getMyEntitlements,
     type Entitlement,
@@ -25,23 +30,22 @@ import { cn, formatDate } from "@/lib/utils";
 const NO_PRODUCTS: Product[] = [];
 const NO_ENTITLEMENTS: Entitlement[] = [];
 
-function priceLabel(product: Product) {
-    const amount = Number(product.price);
+/** "90 days" reads worse than "3 months" on a price card. */
+function accessLabel(days: number) {
+    if (days % 30 === 0) {
+        const months = days / 30;
 
-    if (product.billing_type === "FREE" || amount === 0) {
-        return "Free";
+        return months === 1 ? "1 month of access" : `${months} months of access`;
     }
 
-    const formatted = new Intl.NumberFormat("en-IN", {
-        style: "currency",
-        currency: "INR",
-        maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
-    }).format(amount);
-
-    return product.billing_type === "MONTHLY"
-        ? `${formatted}/month`
-        : formatted;
+    return `${days} days of access`;
 }
+
+/** Plain words for what a plan unlocks. */
+const FEATURE_LABELS: Record<string, string> = {
+    PERSONALIZED_VIDEOS: "Personalised videos",
+    EXERCISE_ROUTINES: "Exercise routines",
+};
 
 export default function Plans() {
     // Date.now() during render is impure; useNow reads a clock through
@@ -167,7 +171,7 @@ export default function Plans() {
                                     </div>
 
                                     <p className="mt-3 text-3xl font-semibold tracking-tight">
-                                        {priceLabel(product)}
+                                        {formatPrice(product)}
                                     </p>
 
                                     {product.description && (
@@ -180,8 +184,9 @@ export default function Plans() {
                                         {product.duration_days ? (
                                             <Badge>
                                                 <CalendarClock className="size-3.5" />
-                                                {product.duration_days} days
-                                                of access
+                                                {accessLabel(
+                                                    product.duration_days,
+                                                )}
                                             </Badge>
                                         ) : (
                                             <Badge>
@@ -189,6 +194,17 @@ export default function Plans() {
                                                 No expiry
                                             </Badge>
                                         )}
+
+                                        {product.features?.map((feature) => (
+                                            <Badge
+                                                key={feature}
+                                                tone="primary"
+                                            >
+                                                <Sparkles className="size-3.5" />
+                                                {FEATURE_LABELS[feature] ??
+                                                    feature}
+                                            </Badge>
+                                        ))}
                                     </div>
 
                                     <div className="mt-auto pt-5">

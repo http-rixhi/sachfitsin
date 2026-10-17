@@ -406,7 +406,7 @@ export default function Calories() {
                                         ? Math.round(
                                               summary.remaining_calories,
                                           )
-                                        : "—"
+                                        : "-"
                                 }
                                 sub="kcal"
                             />
@@ -669,7 +669,7 @@ export default function Calories() {
                     <Field
                         label="Quantity"
                         htmlFor="quantity"
-                        hint="How much you ate — a bowl, 2 rotis, 100 g."
+                        hint="How much you ate: a bowl, 2 rotis, 100 g."
                     >
                         <Input
                             id="quantity"

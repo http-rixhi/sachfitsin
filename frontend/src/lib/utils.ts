@@ -48,13 +48,13 @@ export function initialsOf(...parts: Array<string | undefined | null>) {
 
 export function formatDate(value?: string | null) {
     if (!value) {
-        return "—";
+        return "-";
     }
 
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
-        return "—";
+        return "-";
     }
 
     return date.toLocaleDateString(undefined, {

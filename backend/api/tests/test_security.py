@@ -6,6 +6,8 @@ belonging to Customer B, and an anonymous caller tries to reach everything.
 Nothing here is mocked: these are real requests to real endpoints.
 """
 
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -368,13 +370,37 @@ class CustomerCannotReachAnotherCustomerTests(SecurityFixture):
 class DieticianCannotBeImpersonatedTests(SecurityFixture):
     """A customer must not be able to promote themselves."""
 
-    def test_role_cannot_be_set_at_registration(self):
-        response = self.client.post(
+    @patch("notifications.email.service.client.send", return_value="msg_1")
+    def test_role_cannot_be_set_at_registration(self, mocked_send):
+        # Sign-up is two steps, so the attempt is made at BOTH: once in
+        # the details held for verification, and again when the code is
+        # redeemed. Neither may produce a dietician.
+        start = self.client.post(
             reverse("register"),
             {
                 "username": "sneaky",
                 "email": "sneaky@example.com",
                 "password": "password123",
+                "role": "DIETICIAN",
+            },
+            format="json",
+        )
+
+        self.assertEqual(start.status_code, 202)
+        self.assertFalse(User.objects.filter(username="sneaky").exists())
+
+        text = mocked_send.call_args.kwargs["text"]
+        code = next(
+            token
+            for token in text.replace("\n", " ").split()
+            if token.isdigit() and len(token) == 6
+        )
+
+        response = self.client.post(
+            reverse("verify-email"),
+            {
+                "email": "sneaky@example.com",
+                "code": code,
                 "role": "DIETICIAN",
             },
             format="json",

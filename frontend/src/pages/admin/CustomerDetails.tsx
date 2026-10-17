@@ -233,7 +233,7 @@ export default function CustomerDetails() {
                                     value={
                                         profile.current_weight_kg
                                             ? `${profile.current_weight_kg} kg`
-                                            : "—"
+                                            : "-"
                                     }
                                 />
 
@@ -244,7 +244,7 @@ export default function CustomerDetails() {
                                     value={
                                         profile.target_weight_kg
                                             ? `${profile.target_weight_kg} kg`
-                                            : "—"
+                                            : "-"
                                     }
                                 />
 
@@ -255,7 +255,7 @@ export default function CustomerDetails() {
                                     value={
                                         profile.height_cm
                                             ? `${profile.height_cm} cm`
-                                            : "—"
+                                            : "-"
                                     }
                                 />
 
@@ -267,7 +267,7 @@ export default function CustomerDetails() {
                                         <span className="text-xl">
                                             {titleCase(
                                                 profile.activity_level,
-                                            ) || "—"}
+                                            ) || "-"}
                                         </span>
                                     }
                                 />

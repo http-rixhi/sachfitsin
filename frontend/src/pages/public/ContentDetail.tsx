@@ -11,6 +11,7 @@ import {
     getPublicContentDetail,
 } from "@/services/content";
 import { formatDate, readingTime, titleCase } from "@/lib/utils";
+import { useSeo } from "@/lib/seo";
 
 export default function ContentDetail() {
     const { slug } = useParams<{ slug: string }>();
@@ -33,6 +34,16 @@ export default function ContentDetail() {
     const related = allArticles
         .filter((item) => item.slug !== slug)
         .slice(0, 3);
+
+    // Runs on every render, including while the article is still loading,
+    // because hooks cannot sit behind the early returns below.
+    useSeo({
+        title: article?.title ?? "Article",
+        description:
+            article?.excerpt ??
+            "An article on nutrition and healthy eating from Sachfitsin.",
+        path: `/content/${slug ?? ""}`,
+    });
 
     if (isLoading) {
         return (

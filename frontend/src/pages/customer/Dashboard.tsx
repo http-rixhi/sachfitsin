@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/card";
 import { PageHeader, StatCard } from "@/components/ui/page-header";
 import { ApiErrorState } from "@/components/ui/error-state";
-import { PERSONALIZED_VIDEOS_CODE } from "@/services/products";
+import { FEATURE_PERSONALIZED_VIDEOS } from "@/services/products";
 import {
     CardSkeleton,
     EmptyState,
@@ -122,7 +122,7 @@ export default function Dashboard() {
             <PageHeader
                 eyebrow="Your dashboard"
                 title={`Welcome, ${user?.first_name || user?.username}`}
-                description="Your personalised videos, exercises and daily trackers — all in one place."
+                description="Your personalised videos, exercises and daily trackers, all in one place."
                 actions={
                     <ButtonLink
                         to="/dashboard/profile"
@@ -191,7 +191,7 @@ export default function Dashboard() {
                     value={
                         profile?.current_weight_kg
                             ? `${profile.current_weight_kg} kg`
-                            : "—"
+                            : "-"
                     }
                     sub={
                         weightGap !== null
@@ -209,7 +209,7 @@ export default function Dashboard() {
                     value={
                         profile?.target_weight_kg
                             ? `${profile.target_weight_kg} kg`
-                            : "—"
+                            : "-"
                     }
                     sub="Your goal"
                 />
@@ -218,7 +218,7 @@ export default function Dashboard() {
                     icon={<Ruler />}
                     label="Height"
                     tone="info"
-                    value={profile?.height_cm ? `${profile.height_cm} cm` : "—"}
+                    value={profile?.height_cm ? `${profile.height_cm} cm` : "-"}
                     sub="Used for BMI and targets"
                 />
 
@@ -228,7 +228,7 @@ export default function Dashboard() {
                     tone="warning"
                     value={
                         <span className="text-xl">
-                            {titleCase(profile?.activity_level) || "—"}
+                            {titleCase(profile?.activity_level) || "-"}
                         </span>
                     }
                     sub={
@@ -265,7 +265,7 @@ export default function Dashboard() {
                         <ApiErrorState
                             error={videosQuery.error}
                             title="Unable to load your videos"
-                            upgradeProductCode={PERSONALIZED_VIDEOS_CODE}
+                            upgradeFeature={FEATURE_PERSONALIZED_VIDEOS}
                             onRetry={() => videosQuery.refetch()}
                             isRetrying={videosQuery.isFetching}
                         />
@@ -480,7 +480,7 @@ export default function Dashboard() {
                 </section>
             )}
 
-            {/* Trackers — bottom card buttons */}
+            {/* Trackers: bottom card buttons */}
             <section>
                 <PageHeader
                     title="Daily trackers"

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { ApiErrorState } from "@/components/ui/error-state";
+import { FEATURE_EXERCISE_ROUTINES } from "@/services/products";
 import {
     CardSkeleton,
     EmptyState,
@@ -79,6 +80,7 @@ export default function Exercises() {
                     title="Unable to load your exercises"
                     onRetry={() => exercisesQuery.refetch()}
                     isRetrying={exercisesQuery.isFetching}
+                    upgradeFeature={FEATURE_EXERCISE_ROUTINES}
                 />
             </div>
         );

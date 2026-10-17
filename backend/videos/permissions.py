@@ -2,7 +2,8 @@ from rest_framework.permissions import BasePermission
 
 from accounts.models import User
 from api.exceptions import EntitlementRequired
-from subscriptions.services import has_entitlement
+from subscriptions.features import Feature
+from subscriptions.services import has_feature
 
 
 class IsCustomer(BasePermission):
@@ -35,7 +36,7 @@ class HasPersonalizedVideoEntitlement(BasePermission):
         if request.user.role != User.Role.CUSTOMER:
             return False
 
-        if not has_entitlement(request.user, "PERSONALIZED_VIDEOS"):
+        if not has_feature(request.user, Feature.PERSONALIZED_VIDEOS):
             raise EntitlementRequired(
                 "Personalized videos are not included in your plan."
             )

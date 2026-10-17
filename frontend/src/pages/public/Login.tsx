@@ -9,12 +9,20 @@ import { FormError } from "@/components/ui/form-error";
 import { Spinner } from "@/components/ui/states";
 import { useAuth } from "@/contexts/auth-context";
 import { errorMessage } from "@/lib/api-error";
+import { useSeo } from "@/lib/seo";
 
 interface LoginState {
     notice?: string;
 }
 
 export default function Login() {
+    useSeo({
+        title: "Log In",
+        description: "Log in to your Sachfitsin account.",
+        path: "/login",
+        noIndex: true,
+    });
+
     const navigate = useNavigate();
     const location = useLocation();
     const { login } = useAuth();

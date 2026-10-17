@@ -45,12 +45,17 @@ class VerifyPaymentTests(APITestCase):
             role=User.Role.CUSTOMER,
         )
 
-        self.product = Product.objects.create(
-            code="PERSONALIZED_VIDEOS",
-            name="Personalized Videos",
-            price="499.00",
-            billing_type=Product.BillingType.MONTHLY,
-            status=Product.Status.ACTIVE,
+        # A real plan from the catalogue, because the videos gate asks
+        # which plans unlock the feature, not which product was bought.
+        self.product, _ = Product.objects.get_or_create(
+            code="PERSONALIZED_NUTRITION_COACHING",
+            defaults={
+                "name": "Personalized Nutrition Coaching, 1 Month",
+                "price": "2499.00",
+                "billing_type": Product.BillingType.MONTHLY,
+                "duration_days": 30,
+                "status": Product.Status.ACTIVE,
+            },
         )
 
         self.payment = Payment.objects.create(

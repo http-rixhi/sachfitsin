@@ -206,7 +206,7 @@ function AssignVideoForm({
                                 <option key={video.id} value={video.id}>
                                     {video.title}
                                     {video.category
-                                        ? ` — ${video.category}`
+                                        ? ` - ${video.category}`
                                         : ""}
                                 </option>
                             ))}

@@ -217,7 +217,7 @@ function AssignExerciseForm({
                                 <option key={exercise.id} value={exercise.id}>
                                     {exercise.name}
                                     {exercise.category
-                                        ? ` — ${exercise.category}`
+                                        ? ` - ${exercise.category}`
                                         : ""}
                                 </option>
                             ))}

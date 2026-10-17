@@ -6,7 +6,7 @@ import { StatusBadge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { ApiErrorState } from "@/components/ui/error-state";
-import { PERSONALIZED_VIDEOS_CODE } from "@/services/products";
+import { FEATURE_PERSONALIZED_VIDEOS } from "@/services/products";
 import {
     CardSkeleton,
     EmptyState,
@@ -38,7 +38,7 @@ export default function Videos() {
                 description="Learn from your dietician and watch the videos picked for your plan."
             />
 
-            {/* Personalised first — it is the reason to be here */}
+            {/* Personalised first, it is the reason to be here */}
             <section>
                 <PageHeader
                     title="Personalised for you"
@@ -54,7 +54,7 @@ export default function Videos() {
                         <ApiErrorState
                             error={personalizedVideos.error}
                             title="Unable to load your videos"
-                            upgradeProductCode={PERSONALIZED_VIDEOS_CODE}
+                            upgradeFeature={FEATURE_PERSONALIZED_VIDEOS}
                             onRetry={() => personalizedVideos.refetch()}
                             isRetrying={personalizedVideos.isFetching}
                         />

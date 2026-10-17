@@ -44,7 +44,7 @@ const icons: Record<NotificationCategory, typeof Bell> = {
     GENERAL: Bell,
 };
 
-/** "3 min ago", "2 days ago" — good enough without a date library. */
+/** "3 min ago", "2 days ago". Good enough without a date library. */
 function timeAgo(value: string, now: number) {
     const seconds = Math.round((now - new Date(value).getTime()) / 1000);
 

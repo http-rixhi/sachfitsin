@@ -10,8 +10,16 @@ import { Spinner } from "@/components/ui/states";
 import { useToast } from "@/components/ui/toast-context";
 import { errorMessage, fieldErrors } from "@/lib/api-error";
 import { registerUser } from "@/services/auth";
+import { useSeo } from "@/lib/seo";
 
 export default function Register() {
+    useSeo({
+        title: "Create an Account",
+        description:
+            "Create a free Sachfitsin account to unlock personalised diet plans, exercises and daily tracking.",
+        path: "/register",
+    });
+
     const navigate = useNavigate();
     const { notify } = useToast();
 
@@ -45,11 +53,16 @@ export default function Register() {
         setIsSubmitting(true);
 
         try {
-            await registerUser(form);
+            const started = await registerUser(form);
 
-            notify("Account created. Please sign in.", "success");
+            notify("We sent a code to your email.", "success");
 
-            navigate("/login");
+            // No account exists yet. The code proves the inbox, and the
+            // verify step is what actually creates it.
+            navigate("/verify-email", {
+                replace: true,
+                state: { email: started.email },
+            });
         } catch (submitError) {
             // The backend flags each bad field by name, so they can be
             // shown under the right input instead of all in one banner.

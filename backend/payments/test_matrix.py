@@ -24,7 +24,8 @@ from rest_framework.test import APITestCase
 
 from products.models import Product
 from subscriptions.models import Entitlement, Subscription
-from subscriptions.services import has_entitlement
+from subscriptions.features import Feature
+from subscriptions.services import has_entitlement, has_feature
 
 from .models import Payment
 
@@ -65,16 +66,26 @@ class MatrixBase(APITestCase):
             status=Product.Status.ACTIVE,
         )
 
-        self.monthly = Product.objects.create(
-            code="PERSONALIZED_VIDEOS",
-            name="Personalized Videos",
-            price="499.00",
-            billing_type=Product.BillingType.MONTHLY,
-            duration_days=30,
-            status=Product.Status.ACTIVE,
+        # A real monthly plan, because the paywall tests below check that
+        # buying it opens personalised videos.
+        self.monthly, _ = Product.objects.get_or_create(
+            code="PERSONALIZED_NUTRITION_COACHING",
+            defaults={
+                "name": "Personalized Nutrition Coaching, 1 Month",
+                "price": "2499.00",
+                "billing_type": Product.BillingType.MONTHLY,
+                "duration_days": 30,
+                "status": Product.Status.ACTIVE,
+            },
         )
 
         self.client.force_authenticate(user=self.customer)
+
+    @staticmethod
+    def paise(product):
+        """Razorpay works in paise, and the amount must match exactly."""
+
+        return int(product.price * 100)
 
     def order_for(self, product, order_id):
         return Payment.objects.create(
@@ -221,7 +232,7 @@ class Test4ForgedSignature(MatrixBase):
         self.assertNotEqual(payment.status, Payment.Status.SUCCESS)
         self.assertEqual(Entitlement.objects.count(), 0)
         self.assertFalse(
-            has_entitlement(self.customer, "PERSONALIZED_VIDEOS")
+            has_feature(self.customer, Feature.PERSONALIZED_VIDEOS)
         )
 
 
@@ -237,7 +248,7 @@ class Test5FailedPayment(MatrixBase):
         payment = self.order_for(self.monthly, "order_T5")
 
         response = self.webhook(
-            "payment.failed", "order_T5", "pay_T5", 49900
+            "payment.failed", "order_T5", "pay_T5", self.paise(self.monthly)
         )
 
         self.assertEqual(response.status_code, 200)
@@ -255,7 +266,7 @@ class Test6Webhook(MatrixBase):
 
         with self.captureOnCommitCallbacks(execute=True):
             response = self.webhook(
-                "payment.captured", "order_T6", "pay_T6", 49900
+                "payment.captured", "order_T6", "pay_T6", self.paise(self.monthly)
             )
 
         self.assertEqual(response.status_code, 200)
@@ -273,10 +284,10 @@ class Test6Webhook(MatrixBase):
 
         with self.captureOnCommitCallbacks(execute=True):
             self.webhook(
-                "payment.captured", "order_T6B", "pay_T6B", 49900
+                "payment.captured", "order_T6B", "pay_T6B", self.paise(self.monthly)
             )
             self.webhook(
-                "payment.captured", "order_T6B", "pay_T6B", 49900
+                "payment.captured", "order_T6B", "pay_T6B", self.paise(self.monthly)
             )
 
         self.assertEqual(Entitlement.objects.count(), 1)
@@ -290,7 +301,7 @@ class Test6Webhook(MatrixBase):
         with self.captureOnCommitCallbacks(execute=True):
             self.verify("order_T6C", "pay_T6C")
             self.webhook(
-                "payment.captured", "order_T6C", "pay_T6C", 49900
+                "payment.captured", "order_T6C", "pay_T6C", self.paise(self.monthly)
             )
 
         self.assertEqual(Entitlement.objects.count(), 1)
@@ -304,7 +315,7 @@ class Test7Expiry(MatrixBase):
             self.verify("order_T7", "pay_T7")
 
         self.assertTrue(
-            has_entitlement(self.customer, "PERSONALIZED_VIDEOS")
+            has_feature(self.customer, Feature.PERSONALIZED_VIDEOS)
         )
 
         # Wind the clock past the expiry.
@@ -315,7 +326,7 @@ class Test7Expiry(MatrixBase):
 
         # Access stops immediately, before the command is anywhere near.
         self.assertFalse(
-            has_entitlement(self.customer, "PERSONALIZED_VIDEOS"),
+            has_feature(self.customer, Feature.PERSONALIZED_VIDEOS),
             "access must stop on the date, not when a command runs",
         )
 
@@ -332,7 +343,7 @@ class Test7Expiry(MatrixBase):
         )
 
         self.assertFalse(
-            has_entitlement(self.customer, "PERSONALIZED_VIDEOS")
+            has_feature(self.customer, Feature.PERSONALIZED_VIDEOS)
         )
 
     def test_the_paywall_returns_after_expiry(self):

@@ -3,7 +3,6 @@ import { Mail, MapPin, Phone } from "lucide-react";
 
 import { BRAND_NAME, BrandMark } from "@/components/Brand";
 import {
-    FacebookIcon,
     InstagramIcon,
     WhatsappIcon,
     YoutubeIcon,
@@ -21,11 +20,15 @@ const accountLinks = [
     { label: "Create account", to: "/register" },
 ];
 
+const legalLinks = [
+    { label: "Privacy Policy", to: "/privacy" },
+    { label: "Terms and Conditions", to: "/terms" },
+];
+
 const socials = [
-    { label: "Instagram", href: "https://instagram.com", Icon: InstagramIcon },
-    { label: "Facebook", href: "https://facebook.com", Icon: FacebookIcon },
-    { label: "YouTube", href: "https://youtube.com", Icon: YoutubeIcon },
-    { label: "WhatsApp", href: "https://wa.me/910000000000", Icon: WhatsappIcon },
+    { label: "Instagram", href: "https://instagram.com/sachfitsin", Icon: InstagramIcon },
+    { label: "YouTube", href: "https://youtube.com/@sachfitsin", Icon: YoutubeIcon },
+    { label: "WhatsApp", href: "https://wa.me/919509006393", Icon: WhatsappIcon },
 ];
 
 export default function Footer() {
@@ -47,7 +50,7 @@ export default function Footer() {
 
                         <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
                             Practical nutrition guidance, personalised diet
-                            plans and simple daily tracking — built to help you
+                            plans and simple daily tracking, built to help you
                             reach your health goals and stay there.
                         </p>
 
@@ -129,10 +132,10 @@ export default function Footer() {
                                 <Phone className="mt-0.5 size-4 shrink-0 text-primary" />
 
                                 <a
-                                    href="tel:+910000000000"
+                                    href="tel:+919509006393"
                                     className="text-sm text-muted-foreground transition hover:text-primary"
                                 >
-                                    +91 00000 00000
+                                    +91 9509006393
                                 </a>
                             </li>
 
@@ -152,10 +155,22 @@ export default function Footer() {
                         © {year} {BRAND_NAME}. All rights reserved.
                     </p>
 
-                    <p className="text-xs text-muted-foreground">
-                        Guidance here is educational and does not replace
-                        medical advice.
-                    </p>
+                    <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+                        {legalLinks.map((link) => (
+                            <Link
+                                key={link.label}
+                                to={link.to}
+                                className="text-xs text-muted-foreground transition hover:text-primary"
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
+
+                        <p className="text-xs text-muted-foreground">
+                            Guidance here is educational and does not replace
+                            medical advice.
+                        </p>
+                    </div>
                 </div>
             </div>
         </footer>

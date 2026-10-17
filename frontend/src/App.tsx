@@ -13,6 +13,9 @@ import CustomerDashboard from "./pages/customer/Dashboard";
 import Home from "./pages/public/Home";
 import Login from "./pages/public/Login";
 import Register from "./pages/public/Register";
+import VerifyEmail from "./pages/public/VerifyEmail";
+import Privacy from "./pages/public/Privacy";
+import Terms from "./pages/public/Terms";
 import Content from "./pages/public/Content";
 import ContentDetail from "./pages/public/ContentDetail";
 import NotFound from "./pages/public/NotFound";
@@ -42,8 +45,11 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/content" element={<Content />} />
         <Route path="/content/:slug" element={<ContentDetail />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
         <Route path="*" element={<NotFound />} />
       </Route>
 

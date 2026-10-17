@@ -34,7 +34,7 @@ interface StartPaymentOptions {
  *
  *   ask Django for an order  ->  open Razorpay  ->  customer pays
  *
- * IMPORTANT — Razorpay's success callback is not proof of anything.
+ * IMPORTANT. Razorpay's success callback is not proof of anything.
  *
  * It runs in the browser, and a browser is under the customer's control.
  * Anyone can open the console and call it by hand. So the callback does
@@ -127,7 +127,7 @@ export function useRazorpayCheckout() {
                         } catch {
                             // Never say "payment failed" here. Razorpay may
                             // well have taken the money and only our
-                            // confirmation call failed — the webhook will
+                            // confirmation call failed. The webhook will
                             // settle it server to server. Telling them it
                             // failed invites them to pay a second time.
                             setStage("pending");

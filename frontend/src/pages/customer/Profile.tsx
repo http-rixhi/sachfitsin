@@ -45,11 +45,11 @@ const initialForm: CustomerProfileInput = {
 };
 
 const activityLevels = [
-    { value: "SEDENTARY", label: "Sedentary — mostly sitting" },
-    { value: "LIGHT", label: "Lightly active — light walking" },
-    { value: "MODERATE", label: "Moderately active — regular exercise" },
-    { value: "VERY_ACTIVE", label: "Very active — daily hard exercise" },
-    { value: "ATHLETE", label: "Athlete — training most days" },
+    { value: "SEDENTARY", label: "Sedentary, mostly sitting" },
+    { value: "LIGHT", label: "Lightly active, light walking" },
+    { value: "MODERATE", label: "Moderately active, regular exercise" },
+    { value: "VERY_ACTIVE", label: "Very active, daily hard exercise" },
+    { value: "ATHLETE", label: "Athlete, training most days" },
 ];
 
 const dietaryPreferences = [
@@ -500,7 +500,7 @@ export default function Profile() {
                         <Field
                             label="Allergies"
                             htmlFor="allergies"
-                            hint="Important — this keeps your plan safe."
+                            hint="Important. This keeps your plan safe."
                         >
                             <Textarea
                                 id="allergies"

@@ -232,6 +232,25 @@ EMAIL_TIMEOUT_SECONDS = config(
     cast=int,
 )
 
+# Sign-up email verification
+#
+# No account is created until the emailed code comes back, so these
+# control how long someone has and how many guesses they get.
+
+SIGNUP_OTP_LENGTH = config("SIGNUP_OTP_LENGTH", default=6, cast=int)
+
+SIGNUP_OTP_TTL_SECONDS = config(
+    "SIGNUP_OTP_TTL_SECONDS", default=600, cast=int
+)
+
+SIGNUP_OTP_MAX_ATTEMPTS = config(
+    "SIGNUP_OTP_MAX_ATTEMPTS", default=5, cast=int
+)
+
+SIGNUP_OTP_RESEND_COOLDOWN_SECONDS = config(
+    "SIGNUP_OTP_RESEND_COOLDOWN_SECONDS", default=60, cast=int
+)
+
 SITE_NAME = config("SITE_NAME", default="Sachfitsin")
 
 SUPPORT_EMAIL = config("SUPPORT_EMAIL", default="hello@sachfitsin.com")
@@ -279,6 +298,11 @@ REST_FRAMEWORK = {
         "user": config("THROTTLE_USER", default="240/min"),
         "login": config("THROTTLE_LOGIN", default="10/min"),
         "register": config("THROTTLE_REGISTER", default="20/hour"),
+        # Guessing a six digit code is the attack here, so this is
+        # tighter than register. It also covers resend-code.
+        "verify_email": config(
+            "THROTTLE_VERIFY_EMAIL", default="30/hour"
+        ),
     },
 }
 

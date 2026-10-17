@@ -478,7 +478,7 @@ export default function Videos() {
                         <Field
                             label="Thumbnail URL"
                             htmlFor="video-thumb"
-                            hint="Optional — YouTube thumbnails are automatic."
+                            hint="Optional. YouTube thumbnails are automatic."
                         >
                             <Input
                                 id="video-thumb"

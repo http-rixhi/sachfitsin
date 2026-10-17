@@ -27,6 +27,7 @@ import { getPublicContent } from "@/services/content";
 import type { Content } from "@/services/content";
 import { getPublicVideos, type Video } from "@/services/videos";
 import { cn, titleCase } from "@/lib/utils";
+import { useSeo } from "@/lib/seo";
 
 const NO_ARTICLES: Content[] = [];
 const NO_VIDEOS: Video[] = [];
@@ -56,6 +57,13 @@ const highlights = [
 
 export default function Home() {
     const { isAuthenticated, user } = useAuth();
+
+    useSeo({
+        title: "",
+        description:
+            "Personalised diet plans, guided exercises, and daily calorie and water tracking from your dietician. Free articles and videos for everyone.",
+        path: "/",
+    });
 
     const [search, setSearch] = useState("");
     const [articleFilter, setArticleFilter] = useState("ALL");
@@ -440,7 +448,7 @@ export default function Home() {
                             </h2>
 
                             <p className="mx-auto mt-3 max-w-xl text-sm text-accent-foreground/80 sm:text-base">
-                                Create a free account to unlock your dashboard —
+                                Create a free account to unlock your dashboard,
                                 personalised videos, exercises, calorie and water
                                 tracking, all in one place.
                             </p>

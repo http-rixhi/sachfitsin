@@ -14,8 +14,10 @@ import {
     type PaymentStage,
 } from "@/hooks/useRazorpayCheckout";
 import {
+    cheapest,
     formatPrice,
     getProducts,
+    type Feature,
     type Product,
 } from "@/services/products";
 import { cn } from "@/lib/utils";
@@ -44,13 +46,19 @@ const stageStyles: Partial<
 };
 
 /**
- * Price plus a Buy button for one product, looked up by its code.
+ * Price plus a Buy button for one plan.
  *
- * Codes are used rather than ids so nothing in the front end has to
- * hardcode a database id that differs between environments.
+ * Name either a plan `code`, or the `feature` the customer is trying to
+ * reach. With a feature the cheapest plan that unlocks it is offered,
+ * which is what a paywall wants: the customer cares about getting in, not
+ * about which package it came from.
+ *
+ * Codes rather than ids so nothing here hardcodes a database id that
+ * differs between environments.
  */
 interface BuyProductButtonProps {
-    code: string;
+    code?: string;
+    feature?: Feature;
     /**
      * Hide the price and description when the surrounding card already
      * shows them, so they are not printed twice.
@@ -60,6 +68,7 @@ interface BuyProductButtonProps {
 
 export function BuyProductButton({
     code,
+    feature,
     compact = false,
 }: BuyProductButtonProps) {
     const queryClient = useQueryClient();
@@ -68,11 +77,15 @@ export function BuyProductButton({
         useRazorpayCheckout();
 
     const productsQuery = useQuery({
-        queryKey: ["products", code],
-        queryFn: () => getProducts(code),
+        queryKey: ["products", code ?? null, feature ?? null],
+        queryFn: () => getProducts({ code, feature }),
     });
 
-    const product = (productsQuery.data ?? NO_PRODUCTS)[0];
+    const products = productsQuery.data ?? NO_PRODUCTS;
+
+    // With a feature there may be several plans, so offer the cheapest
+    // way in. With a code there is only ever one.
+    const product = feature ? cheapest(products) : products[0];
 
     if (productsQuery.isLoading) {
         return (
@@ -98,7 +111,7 @@ export function BuyProductButton({
 
     // A plan priced at zero cannot be bought: the backend refuses to
     // create a Razorpay order for nothing, so a Buy button here would
-    // always fail. billing_type is not enough — a ONE_TIME plan left at
+    // always fail. billing_type is not enough: a ONE_TIME plan left at
     // zero behaves the same way.
     if (Number(product.price) <= 0) {
         return (

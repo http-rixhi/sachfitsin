@@ -264,10 +264,12 @@ class PermissionErrorTests(APITestCase):
         from products.models import Product
         from subscriptions.models import Entitlement
 
-        product = Product.objects.create(
-            code="PERSONALIZED_VIDEOS",
-            name="Personalized Videos",
-            status="ACTIVE",
+        product, _ = Product.objects.get_or_create(
+            code="PERSONALIZED_NUTRITION_COACHING",
+            defaults={
+                "name": "Personalized Nutrition Coaching, 1 Month",
+                "status": "ACTIVE",
+            },
         )
 
         Entitlement.objects.create(

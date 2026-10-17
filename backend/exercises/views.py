@@ -1,6 +1,7 @@
 from rest_framework import generics
 
 from notifications import events
+from subscriptions.features import Feature
 from subscriptions.permissions import HasEntitlement
 
 from .models import Exercise, ExerciseRecommendation
@@ -21,7 +22,7 @@ class MyExerciseRecommendationListView(
         HasEntitlement,
     ]
 
-    required_product_code = "EXERCISE_RECOMMENDATIONS"
+    required_feature = Feature.EXERCISE_ROUTINES
 
     def get_queryset(self):
         return (

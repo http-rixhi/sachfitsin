@@ -5,7 +5,7 @@
  *
  *   { "error": { code, message, status, fields? } }
  *
- * but a request can also fail before it ever reaches the backend — the
+ * but a request can also fail before it ever reaches the backend. The
  * server is down, the user is offline, the request timed out. Those have
  * no response body at all, so they are normalised here too. Every page
  * then deals with one type instead of three.

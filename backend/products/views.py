@@ -1,6 +1,8 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
+from subscriptions.features import plans_for_feature
+
 from .models import Product
 from .permissions import IsDietician
 from .serializers import AdminProductSerializer, ProductSerializer
@@ -26,6 +28,16 @@ class ProductListView(generics.ListAPIView):
 
         if code:
             queryset = queryset.filter(code=code.upper())
+
+        # "Which plans would unlock this?" - used by the paywall so it can
+        # offer the cheapest one instead of naming a plan that may not
+        # exist any more.
+        feature = self.request.query_params.get("feature")
+
+        if feature:
+            queryset = queryset.filter(
+                code__in=plans_for_feature(feature.upper())
+            )
 
         return queryset
 

@@ -3,7 +3,7 @@ from rest_framework.permissions import BasePermission
 from accounts.models import User
 from api.exceptions import EntitlementRequired
 
-from .services import has_entitlement
+from .services import has_entitlement, has_feature
 
 
 class IsCustomer(BasePermission):
@@ -37,6 +37,16 @@ class HasEntitlement(BasePermission):
 
         if request.user.role != User.Role.CUSTOMER:
             return False
+
+        # A view names either the feature it needs (preferred, because
+        # several plans can unlock the same one) or a single plan code.
+        feature = getattr(view, "required_feature", None)
+
+        if feature:
+            if not has_feature(request.user, feature):
+                raise EntitlementRequired()
+
+            return True
 
         product_code = getattr(view, "required_product_code", None)
 

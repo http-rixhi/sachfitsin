@@ -338,7 +338,7 @@ export default function Water() {
                                 value={
                                     dailyTarget
                                         ? `${litres(dailyTarget)} L`
-                                        : "—"
+                                        : "-"
                                 }
                             />
 
@@ -354,7 +354,7 @@ export default function Water() {
                                                   0,
                                               ),
                                           )} L`
-                                        : "—"
+                                        : "-"
                                 }
                             />
                         </div>
@@ -446,7 +446,7 @@ export default function Water() {
                 onClose={() => setShowTargetForm(false)}
                 size="sm"
                 title="Daily water target"
-                description="Most adults aim for 2000–3000 ml a day."
+                description="Most adults aim for 2000 to 3000 ml a day."
                 footer={
                     <>
                         <Button

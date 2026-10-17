@@ -5,7 +5,7 @@ import { toApiError } from "@/lib/api-error";
 /**
  * One retry policy for the whole app.
  *
- * Retrying a 400 or a 403 is pointless — the answer will not change, and it
+ * Retrying a 400 or a 403 is pointless: the answer will not change, and it
  * just delays the error the user needs to see. Retrying a 500 or a dropped
  * connection is worth it, because those often clear on their own.
  */

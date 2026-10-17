@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Nothing useful to a search engine lives behind the login, and these
+# pages change per person.
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /verify-email
+
+Sitemap: https://sachfitsin.com/sitemap.xml

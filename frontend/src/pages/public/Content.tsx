@@ -16,10 +16,18 @@ import {
     type Content as ContentItem,
 } from "@/services/content";
 import { cn, titleCase } from "@/lib/utils";
+import { useSeo } from "@/lib/seo";
 
 const NO_CONTENT: ContentItem[] = [];
 
 export default function Content() {
+    useSeo({
+        title: "Nutrition Articles",
+        description:
+            "Free articles on nutrition, healthy eating and daily habits, written by a qualified dietician.",
+        path: "/content",
+    });
+
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("ALL");
 

@@ -2,11 +2,68 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sachfitsin — Nutrition &amp; Wellness</title>
-    <meta name="description" content="Articles, videos, personalised diet plans, exercises and daily trackers from your dietician." />
-    <meta name="theme-color" content="#f7faf8" />
+
+    <title>Sachfitsin | Diet Plans and Nutrition Guidance</title>
+    <meta
+      name="description"
+      content="Personalised diet plans, guided exercises, and daily calorie and water tracking from your dietician. Free articles and videos for everyone."
+    />
+
+    <link rel="canonical" href="https://sachfitsin.com/" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#2f9e6e" />
+
+    <!-- How the link looks when shared. Social crawlers do not run
+         JavaScript, so these have to be static here rather than set by
+         React on each page. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sachfitsin" />
+    <meta property="og:title" content="Sachfitsin | Diet Plans and Nutrition Guidance" />
+    <meta
+      property="og:description"
+      content="Personalised diet plans, guided exercises, and daily calorie and water tracking from your dietician."
+    />
+    <meta property="og:url" content="https://sachfitsin.com/" />
+    <meta property="og:image" content="https://sachfitsin.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Sachfitsin. Diet plans, exercises and daily tracking from your dietician." />
+    <meta property="og:locale" content="en_IN" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Sachfitsin | Diet Plans and Nutrition Guidance" />
+    <meta
+      name="twitter:description"
+      content="Personalised diet plans, guided exercises, and daily calorie and water tracking from your dietician."
+    />
+    <meta name="twitter:image" content="https://sachfitsin.com/og-image.png" />
+
+    <!-- Speeds up the first API call and the checkout script. -->
+    <link rel="preconnect" href="https://api.sachfitsin.com" />
+    <link rel="dns-prefetch" href="https://checkout.razorpay.com" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Sachfitsin",
+        "url": "https://sachfitsin.com/",
+        "logo": "https://sachfitsin.com/icon-512.png",
+        "description": "Personalised diet plans, guided exercises, and daily calorie and water tracking from a qualified dietician.",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer support",
+          "email": "hello@sachfitsin.com",
+          "availableLanguage": ["English", "Hindi"]
+        }
+      }
+    </script>
 
     <!--
       Razorpay Checkout, loaded from Razorpay's own servers.
