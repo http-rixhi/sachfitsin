@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-import { Fill, LegalPage, List, Section } from "@/components/LegalPage";
+import { LegalPage, List, Section } from "@/components/LegalPage";
 import { useSeo } from "@/lib/seo";
 
 export default function Terms() {
